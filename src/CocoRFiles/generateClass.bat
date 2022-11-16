@@ -1,2 +1,2 @@
 @ECHO
-java -jar Coco.jar grammar.ATG -package "Program" -frames "frames" -trace "traceString" -o "Program"
+java -jar Coco.jar grammar.ATG -package "CocoRFiles.Program" -frames "frames" -trace "traceString" -o "Program"

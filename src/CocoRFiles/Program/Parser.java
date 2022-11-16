@@ -34,7 +34,7 @@ public class Parser {
 		errors = new Errors();
 	}
 
-    void SynErr (int n) {
+	void SynErr (int n) {
 		if (errDist >= minErrDist) errors.SynErr(la.line, la.col, n);
 		errDist = 0;
 	}

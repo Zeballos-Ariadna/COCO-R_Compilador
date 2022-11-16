@@ -33,7 +33,7 @@ PRODUCTIONS
         XmlStart Attribute [Attribute] XmlEnd.
 
     Element =
-        EmptyElementTag | STag Content ETag.
+        IF( isEmptyElement() ) EmptyElementTag | STag Content ETag.
 
     STag =
         Less Name {Attribute} More.
@@ -45,7 +45,7 @@ PRODUCTIONS
         Less Slash Name More.
 
     Content =
-        {(CharData | Name | More | Quote | DoubleQuote | AND )} {(Element | Comment | {(CharData | Name | More | Quote | DoubleQuote | AND )})}.
+        { IF( anotherIteration() ) (Element | Comment | (CharData | Name | More | Quote | DoubleQuote | AND ))}.
 
     EmptyElementTag =
         Less Name {Attribute} Slash More.

@@ -86,7 +86,27 @@ public class Parser {
 			return StartOf(syFol);
 		}
 	}
-	
+
+	boolean isEmptyElement() {
+		Token x = la; //The look ahead token, the next unread token.
+		boolean bFoundSlash = false;
+		while (x.kind != _More) {
+			if ( x.kind == _Slash ) {
+				bFoundSlash = true;
+			}
+			x = scanner.Peek();
+		}
+		return bFoundSlash;
+	}
+
+	boolean anotherIteration() {
+		if ( la.kind == _Less ) {
+			Token next = scanner.Peek();
+			return next.kind != _Slash;
+		}
+		return la.kind == _Comment || la.kind == _CharData || la.kind == _Name || la.kind == _More || la.kind == _Quote || la.kind == _DoubleQuote || la.kind == _AND;
+	}
+
 	void Xml() {
 		Prolog();
 		Element();
@@ -105,7 +125,7 @@ public class Parser {
 	}
 
 	void Element() {
-		if (la.kind == 7) {
+		if (isEmptyElement() ) {
 			EmptyElementTag();
 		} else if (la.kind == 7) {
 			STag();
@@ -160,69 +180,39 @@ public class Parser {
 	}
 
 	void Content() {
-		while (StartOf(1)) {
-			switch (la.kind) {
-			case 2: {
-				Get();
-				break;
-			}
-			case 1: {
-				Get();
-				break;
-			}
-			case 9: {
-				Get();
-				break;
-			}
-			case 10: {
-				Get();
-				break;
-			}
-			case 11: {
-				Get();
-				break;
-			}
-			case 12: {
-				Get();
-				break;
-			}
-			}
-		}
-		while (StartOf(2)) {
+		while (anotherIteration() ) {
 			if (la.kind == 7) {
 				Element();
 			} else if (la.kind == 3) {
 				Get();
-			} else {
-				while (StartOf(1)) {
-					switch (la.kind) {
-					case 2: {
-						Get();
-						break;
-					}
-					case 1: {
-						Get();
-						break;
-					}
-					case 9: {
-						Get();
-						break;
-					}
-					case 10: {
-						Get();
-						break;
-					}
-					case 11: {
-						Get();
-						break;
-					}
-					case 12: {
-						Get();
-						break;
-					}
-					}
+			} else if (StartOf(1)) {
+				switch (la.kind) {
+				case 2: {
+					Get();
+					break;
 				}
-			}
+				case 1: {
+					Get();
+					break;
+				}
+				case 9: {
+					Get();
+					break;
+				}
+				case 10: {
+					Get();
+					break;
+				}
+				case 11: {
+					Get();
+					break;
+				}
+				case 12: {
+					Get();
+					break;
+				}
+				}
+			} else SynErr(16);
 		}
 	}
 
@@ -246,8 +236,7 @@ public class Parser {
 
 	private static final boolean[][] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_T,_T,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_T, _x,_T,_T,_T, _T,_x,_x}
+		{_x,_T,_T,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x}
 
 	};
 } // end Parser
@@ -288,6 +277,7 @@ class Errors {
 			case 13: s = "??? expected"; break;
 			case 14: s = "invalid Element"; break;
 			case 15: s = "invalid Attribute"; break;
+			case 16: s = "invalid Content"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);
